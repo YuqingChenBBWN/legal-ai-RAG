@@ -71,10 +71,10 @@ def process_uploaded_document(document_name):
         return None
 
 def main():
-    if not get_credentials():
-        st.stop()
-        
     st.title("Legal Document Q&A System")
+
+    # Get API credentials
+    api_key_entered = get_credentials()
 
     # File upload
     upload_document(DOCUMENT_FOLDER)
@@ -86,13 +86,16 @@ def main():
             st.session_state.document_name = st.selectbox("Select a document to process", uploaded_files)
             
             if st.button("Process Document"):
-                with st.spinner("Processing document..."):
-                    st.session_state.collection = process_uploaded_document(st.session_state.document_name)
-                    if st.session_state.collection:
-                        st.session_state.document_processed = True
-                        st.success("Document processing complete!")
-                    else:
-                        st.error("Document processing failed. Please check the error messages above.")
+                if not api_key_entered:
+                    st.warning("Please enter your OpenAI API key in the sidebar before processing documents.")
+                else:
+                    with st.spinner("Processing document..."):
+                        st.session_state.collection = process_uploaded_document(st.session_state.document_name)
+                        if st.session_state.collection:
+                            st.session_state.document_processed = True
+                            st.success("Document processing complete!")
+                        else:
+                            st.error("Document processing failed. Please check the error messages above.")
         else:
             st.info("No PDF documents found. Please upload a PDF file first.")
     else:
@@ -102,7 +105,9 @@ def main():
     query = st.text_input("Enter your legal question:")
 
     if st.button("Submit Question"):
-        if not st.session_state.document_processed:
+        if not api_key_entered:
+            st.warning("Please enter your OpenAI API key in the sidebar before submitting questions.")
+        elif not st.session_state.document_processed:
             st.warning("Please upload and process a document first.")
         elif query:
             with st.spinner("Searching for an answer..."):
@@ -130,3 +135,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    

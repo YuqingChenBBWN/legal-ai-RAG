@@ -12,4 +12,3 @@ def get_credentials():
         else:
             st.warning("Please enter your OpenAI API key")
             return False
-            
