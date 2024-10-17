@@ -1,7 +1,3 @@
-__import__("pysqlite3")
-import sys
-sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
-
 import streamlit as st
 import os
 from utilities.layout import page_config
@@ -9,7 +5,6 @@ from utilities.documents import upload_document, chunk_document, download_docume
 from utilities.chroma_db import get_or_create_persistent_chromadb_client_and_collection, add_document_chunk_to_chroma_collection, query_chromadb_collection
 from utilities.ai_embedding import text_small_embedding
 from utilities.ai_inference import gpt4o_mini_inference
-from modules.openai_credentials import get_credentials
 
 # Set page configuration
 page_config()
@@ -73,9 +68,6 @@ def process_uploaded_document(document_name):
 def main():
     st.title("Legal Document Q&A System")
 
-    # Get API credentials
-    api_key_entered = get_credentials()
-
     # File upload
     upload_document(DOCUMENT_FOLDER)
     
@@ -86,16 +78,13 @@ def main():
             st.session_state.document_name = st.selectbox("Select a document to process", uploaded_files)
             
             if st.button("Process Document"):
-                if not api_key_entered:
-                    st.warning("Please enter your OpenAI API key in the sidebar before processing documents.")
-                else:
-                    with st.spinner("Processing document..."):
-                        st.session_state.collection = process_uploaded_document(st.session_state.document_name)
-                        if st.session_state.collection:
-                            st.session_state.document_processed = True
-                            st.success("Document processing complete!")
-                        else:
-                            st.error("Document processing failed. Please check the error messages above.")
+                with st.spinner("Processing document..."):
+                    st.session_state.collection = process_uploaded_document(st.session_state.document_name)
+                    if st.session_state.collection:
+                        st.session_state.document_processed = True
+                        st.success("Document processing complete!")
+                    else:
+                        st.error("Document processing failed. Please check the error messages above.")
         else:
             st.info("No PDF documents found. Please upload a PDF file first.")
     else:
@@ -105,9 +94,7 @@ def main():
     query = st.text_input("Enter your legal question:")
 
     if st.button("Submit Question"):
-        if not api_key_entered:
-            st.warning("Please enter your OpenAI API key in the sidebar before submitting questions.")
-        elif not st.session_state.document_processed:
+        if not st.session_state.document_processed:
             st.warning("Please upload and process a document first.")
         elif query:
             with st.spinner("Searching for an answer..."):
@@ -135,4 +122,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
