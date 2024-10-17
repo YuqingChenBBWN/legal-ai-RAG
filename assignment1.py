@@ -9,6 +9,7 @@ from utilities.documents import upload_document, chunk_document, download_docume
 from utilities.chroma_db import get_or_create_persistent_chromadb_client_and_collection, add_document_chunk_to_chroma_collection, query_chromadb_collection
 from utilities.ai_embedding import text_small_embedding
 from utilities.ai_inference import gpt4o_mini_inference
+from modules.openai_credentials import get_credentials
 
 # Set page configuration
 page_config()
@@ -70,6 +71,9 @@ def process_uploaded_document(document_name):
         return None
 
 def main():
+    if not get_credentials():
+        st.stop()
+        
     st.title("Legal Document Q&A System")
 
     # File upload

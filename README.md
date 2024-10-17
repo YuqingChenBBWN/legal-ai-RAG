@@ -49,4 +49,4 @@ If you don't see the (/opt/conda/envs), use:
 `conda activate .`
 
 
-URL：legal-ai-rag-xxcsdjd4dwl2zsappoxuiaf.streamlit.app
+URL:legal-ai-rag-xxcsdjd4dwl2zsappoxuiaf.streamlit.app
